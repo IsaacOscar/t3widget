@@ -106,7 +106,7 @@ void file_pane_t::ensure_cursor_on_screen() {
 
   height = window.get_height() - 1;
 
-  while (impl->current >= impl->top_idx + impl->columns_visible * height) {
+  while (height != 0 && impl->current >= impl->top_idx + impl->columns_visible * height) {
     impl->top_idx += height;
   }
   while (impl->current < impl->top_idx && impl->top_idx > static_cast<size_t>(height)) {
@@ -229,7 +229,7 @@ bool file_pane_t::set_size(optint height, optint width) {
   height = height.value() - 1;
   if (impl->file_list != nullptr && impl->file_list->size() != 0) {
     update_column_widths();
-    impl->scrollbar_range =
+    impl->scrollbar_range = height.value() == 0 ? 0 :
         ((impl->file_list->size() + height.value() - 1) / height.value()) * height.value();
     ensure_cursor_on_screen();
   }
@@ -444,7 +444,7 @@ void file_pane_t::content_changed() {
 
   impl->top_idx = 0;
   update_column_widths();
-  impl->scrollbar_range = ((impl->file_list->size() + height - 1) / height) * height;
+  impl->scrollbar_range = height == 0 ? 0 : ((impl->file_list->size() + height - 1) / height) * height;
   force_redraw();
 }
 
